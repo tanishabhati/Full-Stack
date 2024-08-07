@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"
+        integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        .result {
+            background-color: green;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .row {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="row">
+        <div class="col">
+            <div style="width:500px;" id="reader"></div>
+        </div>
+        <div class="col" style="padding:30px;">
+            <h4>SCAN RESULT</h4>
+            <div id="result">Result Here</div>
+        </div>
+    </div>
+
+
+
+</body>
+<script type="text/javascript">
+    function onScanSuccess(qrCodeMessage) {
+        document.getElementById('result').innerHTML = '<span class="result">' + "QR Scan Successfull" + '</span>';
+        
+        (async () => {
+            const rawResponse = await fetch('/updateRecord', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(JSON.parse(qrCodeMessage))
+            });
+            const content = await rawResponse.json();
+            
+            window.location.reload();
+            console.log(content);
+        })();
+        setTimeout(function() {
+            document.getElementById('result').innerHTML = "Result Here";
+        }, 5000);
+    }
+
+    function onScanError(errorMessage) {
+        //handle scan error
+    }
+
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
+
+</script>
+
+</html>
